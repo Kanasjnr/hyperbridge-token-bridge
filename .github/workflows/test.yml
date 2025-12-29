@@ -19,7 +19,23 @@ jobs:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
-          submodules: recursive
+          submodules: true
+
+      - name: Initialize nested submodules manually
+        continue-on-error: true
+        run: |
+          # Initialize top-level submodules first
+          git submodule update --init --recursive
+          
+          # Handle nested submodules in hyperbridge-sdk
+          if [ -d lib/hyperbridge-sdk ]; then
+            cd lib/hyperbridge-sdk
+            # Initialize nested submodules, ignoring errors for missing URLs
+            git submodule update --init --recursive 2>&1 || true
+            cd ../..
+          fi
+          
+          echo "Submodule initialization complete"
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1

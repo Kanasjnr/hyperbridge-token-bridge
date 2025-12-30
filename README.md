@@ -77,11 +77,15 @@ The TokenBridge contract sits between users and the TokenGateway, providing:
 ## Supported Networks
 
 The bridge supports transfers between:
-- Paseo (Polkadot testnet)
-- Ethereum Sepolia
+- **Base Sepolia** (Deployed ✅)
+- **Ethereum Sepolia** (Ready for deployment)
+- Paseo (Polkadot testnet) - Can receive tokens from EVM chains
 - BSC Testnet
 - Optimism Sepolia
+- Arbitrum Sepolia
 - Other EVM-compatible chains via StateMachine identifiers
+
+**Note:** Paseo is a Substrate chain (not EVM), so you cannot deploy Solidity contracts there. However, you can bridge tokens TO Paseo from EVM chains using Hyperbridge.
 
 ## Project Structure
 
@@ -91,7 +95,9 @@ The bridge supports transfers between:
 │   └── TokenBridge.sol          # Main bridge contract
 ├── test/
 │   └── TokenBridge.t.sol        # Comprehensive test suite
-├── script/                      # Deployment scripts (to be added)
+├── script/                      # Deployment scripts
+│   ├── DeploySepolia.s.sol      # Ethereum Sepolia deployment
+│   └── DeployBaseSepolia.s.sol  # Base Sepolia deployment
 └── lib/                         # Dependencies
     ├── hyperbridge-sdk/         # Hyperbridge SDK
     └── openzeppelin-contracts/  # OpenZeppelin contracts
@@ -156,11 +162,30 @@ forge fmt
 
 ### Deployment
 
-Deployment scripts will be added in the `script/` directory. Example:
+Deployment scripts are available in the `script/` directory. Simply provide your RPC URL and private key directly in the command:
 
+**Deploy to Base Sepolia:**
 ```bash
-forge script script/Deploy.s.sol:DeployScript --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+forge script script/DeployBaseSepolia.s.sol:DeployBaseSepolia \
+  --rpc-url https://sepolia.base.org \
+  --private-key YOUR_PRIVATE_KEY \
+  --broadcast \
+  -vvvv
 ```
+
+**Deploy to Ethereum Sepolia:**
+```bash
+forge script script/DeploySepolia.s.sol:DeploySepolia \
+  --rpc-url https://rpc.sepolia.org \
+  --private-key YOUR_PRIVATE_KEY \
+  --broadcast \
+  -vvvv
+```
+
+**Note:** If `https://rpc.sepolia.org` times out, try alternative RPC endpoints like:
+- `https://ethereum-sepolia-rpc.publicnode.com`
+- `https://sepolia.gateway.tenderly.co`
+- Or use Infura/Alchemy endpoints
 
 ## Contract Interface
 
@@ -225,6 +250,25 @@ The test suite includes 21 comprehensive tests covering:
 - Fuzz testing
 
 All tests pass successfully.
+
+## Deployed Contracts
+
+### Base Sepolia (Testnet)
+- **Contract Address**: `0xFA009a2B865A436A9A50a68f35117D8799b08a6e`
+- **Transaction Hash**: `0x91a8bb4dc0a1e415088ef94ddb5cbe4e1ccfbbbf75e860de5b677f9b8e2b34c7`
+- **Block Number**: 35666850
+- **Network**: Base Sepolia (Chain ID: 84532)
+- **StateMachine**: EVM-84532
+- **Explorer**: [View on Basescan](https://sepolia.basescan.org/address/0xFA009a2B865A436A9A50a68f35117D8799b08a6e)
+- **TokenGateway**: `0xFcDa26cA021d5535C3059547390E6cCd8De7acA6`
+- **FeeToken (USD.h)**: `0xA801da100bF16D07F668F4A49E1f71fc54D05177`
+
+### Ethereum Sepolia (Testnet)
+- **Status**: Ready for deployment
+- **Network**: Ethereum Sepolia (Chain ID: 11155111)
+- **StateMachine**: EVM-11155111
+- **TokenGateway**: `0xFcDa26cA021d5535C3059547390E6cCd8De7acA6`
+- **FeeToken (USD.h)**: `0xA801da100bF16D07F668F4A49E1f71fc54D05177`
 
 ## Development
 
